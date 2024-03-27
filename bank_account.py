@@ -86,3 +86,7 @@ def run_account():
             break
         else:
             print('Неверный пункт меню')
+
+
+if __name__ == '__main__':
+    pass
