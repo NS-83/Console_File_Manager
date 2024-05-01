@@ -1,6 +1,7 @@
 import os
-import sys
 import main
+import bank_account
+import json
 
 
 def test_create_folder():
@@ -32,4 +33,57 @@ def test_copy_item():
 
 def test_author():
     assert main.author() == 'Степанов'
+
+
+def test_load_data():
+    test_files_names = ('test load account.txt', 'test load history.txt')
+    for file_name in test_files_names:
+        if os.path.exists(file_name):
+            os.remove(file_name)
+    test_data = bank_account.load_data(test_files_names)
+    assert test_data[0] == 0
+    assert test_data[1] == []
+    with open('test load account.txt', 'w') as f:
+        f.write(str(1000))
+    purchase_history = [{'purchase_name': 'стол', 'purchase_sum': 100}, {'purchase_name': 'стул', 'purchase_sum': 50}]
+    with open('test load history.txt', 'w') as f:
+        json.dump(purchase_history, f)
+    test_data = bank_account.load_data(test_files_names)
+    assert test_data[0] == 1000
+    assert test_data[1] == purchase_history
+
+
+def test_save_data():
+    test_files_names = ('test load account.txt', 'test load history.txt')
+    for file_name in test_files_names:
+        if os.path.exists(file_name):
+            os.remove(file_name)
+    account_sum = 1000
+    purchase_history = [{'purchase_name': 'стол', 'purchase_sum': 100}, {'purchase_name': 'стул', 'purchase_sum': 50}]
+    save_data = (account_sum, purchase_history)
+    bank_account.save_data(save_data, test_files_names)
+    with open('test load account.txt') as f:
+        file_sum = int(f.readline())
+    assert file_sum == account_sum
+    with open('test load history.txt') as f:
+        history_string = f.readline()
+    assert json.loads(history_string) == purchase_history
+
+
+def test_save_working_dir():
+    file_name = 'test working dir'
+    if os.path.exists(file_name):
+        os.remove(file_name)
+    main.save_working_dir_content(file_name)
+    folder_content = os.listdir()
+    dir_filter = filter(lambda x: os.path.isdir(x), folder_content)
+    files_filter = filter(lambda x: os.path.isfile(x) and x != 'test working dir', folder_content)
+    dir_str = ', '.join(dir_filter)
+    dir_str = f'dirs: {dir_str}'
+    files_str = ', '.join(files_filter)
+    files_str = f'files: {files_str}'
+    with open(file_name) as f:
+        file_lines = f.readlines()
+    assert file_lines[0].strip() == files_str
+    assert file_lines[1].strip() == dir_str
 

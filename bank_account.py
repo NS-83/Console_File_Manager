@@ -27,6 +27,10 @@
 При выполнении задания можно пользоваться любыми средствами
 Для реализации основного меню можно использовать пример ниже или написать свой
 """
+import json
+import os
+ACCOUNT_SUM_FILE = 'account.txt'
+SHOPPING_HISTORY_FILE = 'shopping.txt'
 
 
 def increase_account():
@@ -62,10 +66,32 @@ def sum_input(sum_type):
         print('Введена некорректная сумма!')
 
 
+def save_data(data, file_names):
+    with open(file_names[0], 'w') as f:
+        account_sum = str(data[0])
+        f.write(account_sum)
+    with open(file_names[1], 'w') as f:
+        json.dump(data[1], f)
+
+
+def load_data(file_names):
+    account_sum = 0
+    shopping_list = []
+    if os.path.exists(file_names[0]):
+        with open(file_names[0]) as f:
+            file_line = f.readline()
+            account_sum = float(file_line)
+    if os.path.exists(file_names[1]):
+        with open(file_names[1]) as f:
+            shopping_list = json.load(f)
+    return account_sum, shopping_list
+
+
 def run_account():
-    account = 0
-    # Можно историю покупок сделать просто словарем, но хочется вывод по порядку
-    purchase_history = []
+    saved_files = (ACCOUNT_SUM_FILE, SHOPPING_HISTORY_FILE)
+    saved_data = load_data(saved_files)
+    account = saved_data[0]
+    purchase_history = saved_data[1]
     while True:
         print('1. пополнение счета')
         print('2. покупка')
@@ -83,10 +109,9 @@ def run_account():
         elif choice == '3':
             print_purchase_history(purchase_history)
         elif choice == '4':
+            data_to_save = (account, purchase_history)
+            save_data(data_to_save, saved_files)
             break
         else:
             print('Неверный пункт меню')
 
-
-if __name__ == '__main__':
-    pass
