@@ -2,6 +2,7 @@ import os
 import main
 import bank_account
 import json
+import victory
 
 
 def test_create_folder():
@@ -87,3 +88,20 @@ def test_save_working_dir():
     assert file_lines[0].strip() == files_str
     assert file_lines[1].strip() == dir_str
 
+
+def test_string_to_float():
+    assert not bank_account.string_to_float('некорректная строка')[1]
+    result = bank_account.string_to_float('1.5')
+    assert result[0] == 1.5 and result[1]
+
+
+def test_generate_questions_list():
+    persons_list = {'Н. В. Гоголь': '10.03.1809',
+                    'М. Е. Салтыков-Щедрин': '27.01.1826'}
+    day_strings = {'10': 'десятого',
+                   '27': 'двадцать седьмого'}
+    month_strings = {'03': 'марта',
+                     '01': 'января'}
+    result = victory.generate_questions_list(persons_list, day_strings, month_strings)
+    assert result == [('Н. В. Гоголь', '10.03.1809', 'десятого', 'марта'),
+                      ('М. Е. Салтыков-Щедрин', '27.01.1826', 'двадцать седьмого', 'января')]

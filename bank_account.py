@@ -29,6 +29,7 @@
 """
 import json
 import os
+
 ACCOUNT_SUM_FILE = 'account.txt'
 SHOPPING_HISTORY_FILE = 'shopping.txt'
 
@@ -46,6 +47,14 @@ def make_purchase(account_sum):
         return {'purchase_name': purchase_name, 'purchase_sum': purchase_sum}
 
 
+def purchase_history_decorator(fn):
+    def inner_func(*args):
+        print('История покупок')
+        fn(*args)
+    return inner_func
+
+
+@purchase_history_decorator
 def print_purchase_history(purchase_list):
     for purchase_data in purchase_list:
         print(f'Покупка: {purchase_data["purchase_name"]} Сумма: {purchase_data["purchase_sum"]}')
@@ -54,16 +63,19 @@ def print_purchase_history(purchase_list):
 def sum_input(sum_type):
     while True:
         sum_string = input(f'Введите сумму {sum_type}: ').strip()
-        if sum_string.isdigit():
-            return int(sum_string)
+        result = string_to_float(sum_string)
+        if result[1]:
+            return result[0]
         else:
-            if sum_string.find(',') != -1:
-                sum_string = sum_string.replace(',', '.')
-            sum_string_parts = sum_string.split('.')
-            sum_string_parts = list(filter(lambda x: x.isdigit(), sum_string_parts))
-            if len(sum_string_parts) == 2:
-                return float(sum_string)
-        print('Введена некорректная сумма!')
+            print('Введена некорректная сумма!')
+
+
+def string_to_float(sum_string):
+    try:
+        sum_float = float(sum_string)
+        return sum_float, True
+    except ValueError:
+        return 0, False
 
 
 def save_data(data, file_names):
@@ -114,4 +126,3 @@ def run_account():
             break
         else:
             print('Неверный пункт меню')
-
