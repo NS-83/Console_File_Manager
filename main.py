@@ -119,7 +119,6 @@ if __name__ == '__main__':
     while True:
         print_menu()
         chosen_item = get_menu_item_number()
-        print(chosen_item)
         if chosen_item == 1:
             new_folder = input('Введите имя новой папки: ')
             create_folder(new_folder)
